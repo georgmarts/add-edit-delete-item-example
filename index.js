@@ -8,7 +8,10 @@ function App() {
 
   const [inputValue, setInputValue] = useState('')
   const [editInputValue, setEditInputValue] = useState('')
-  const [currentItem, setCurrentItem] = useState({})
+  const [isLoading, setisLoading] = useState(false)
+  function handleEditBtn() {
+    setisLoading(x => !x)
+  }
 
   // ADD ITEM LOGIC
 
@@ -24,46 +27,35 @@ function App() {
 
   // EDIT LOGIC
 
-  // Get the object and make it the current object
-
-  function handleEdit(arg) {
-    setCurrentItem(arg)
-  }
-
-  // Add input value to the current object
-
   function handleEditInput(e) {
     setEditInputValue(e.target.value)
-    setCurrentItem({...currentItem, text: e.target.value})
   }
 
   // Create copy of updated data and replace existing data with it
 
-  function handleEditSubmit() {
+  function handleEditSubmit(arg) {
     const updatedData = data.map((x) => {
-      return x.id === currentItem.id ? currentItem : x;
+      return x.id === arg.id ? {...x, text: editInputValue} : {...x};
     })
     setData(updatedData)
     setEditInputValue('')
   }
 
-  // DELETE LOGIC (works if edit button is clicked only)
+  // DELETE LOGIC
 
-  function handleDeleteBtn() {
-    const filteredData = data.filter((x)=>x.id !== currentItem.id)
+  function handleDeleteBtn(arg) {
+    const filteredData = data.filter((x)=>x.id !== arg.id)
     setData(filteredData)
   }
   
-  // CHANGE STYLE OF SELECTED ITEM (works if edit button is clicked only)
-  function handleStyleBtn() {
+  // CHANGE STYLE OF SELECTED ITEM
+  function handleStyleBtn(arg) {
     const stylizedData = data.map((x)=> {
-      return x.id === currentItem.id ? {...x, color: 'red'} : {...x, color: 'none'}
+      return x.id === arg.id ? x.color === 'red' ? {...x, color: 'none'} : {...x, color: 'red'} : {...x, color: 'none'}
     })
     setData(stylizedData)
   }
-
-  console.log(data)
-
+  
   return <main style={{display: 'grid', width: '400px'}}>
 
     <input onChange={handleInput} type='text' value={inputValue}/>
@@ -71,11 +63,15 @@ function App() {
 
     {data.map((x)=>{return <div>
       <h5 style={x.color === 'red' ? {backgroundColor: 'red'} : {}}>{x.text}</h5>
-      <button onClick={() => handleEdit(x)}>Edit</button>
+      <button onClick={handleEditBtn}>Edit</button>
+
+      
+    {isLoading ? <>
       <input type='text' onChange={handleEditInput} value={editInputValue} style={{width: '110px'}}></input>
-      <button onClick={handleEditSubmit}>Submit Edit</button>
-      <button onClick={handleDeleteBtn}>Delete</button>
-      <button onClick={handleStyleBtn}>Stylize</button>
+      <button onClick={() => handleEditSubmit(x)}>Submit Edit</button>
+      <button onClick={() => handleDeleteBtn(x)}>Delete</button>
+      <button onClick={() => handleStyleBtn(x)}>Stylize</button> </> : null}
+
       </div>
       })}
   </main>
