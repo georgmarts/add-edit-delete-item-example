@@ -2,7 +2,7 @@ const { useState, useEffect, useContext, useRef } = React;
 
 function App() {
 
-  const [data, setData] = useState([{id: Date.now(), text: 'Test 1'}])
+  const [data, setData] = useState([{id: Date.now(), text: 'Test 1', color: 'none'}])
 
   // INPUT VALUES
 
@@ -37,9 +37,6 @@ function App() {
     setCurrentItem({...currentItem, text: e.target.value})
   }
 
-  console.log(editInputValue)
-  console.log(currentItem)
-
   // Create copy of updated data and replace existing data with it
 
   function handleEditSubmit() {
@@ -56,6 +53,16 @@ function App() {
     const filteredData = data.filter((x)=>x.id !== currentItem.id)
     setData(filteredData)
   }
+  
+  // CHANGE STYLE OF SELECTED ITEM (works if edit button is clicked only)
+  function handleStyleBtn() {
+    const stylizedData = data.map((x)=> {
+      return x.id === currentItem.id ? {...x, color: 'red'} : {...x, color: 'none'}
+    })
+    setData(stylizedData)
+  }
+
+  console.log(data)
 
   return <main style={{display: 'grid', width: '400px'}}>
 
@@ -63,11 +70,12 @@ function App() {
     <input onClick={handleSubmit} type='submit' value='Add'/>
 
     {data.map((x)=>{return <div>
-      <h5 style={{display: 'inline', marginRight: '10px'}}>{x.text}</h5>
+      <h5 style={x.color === 'red' ? {backgroundColor: 'red'} : {}}>{x.text}</h5>
       <button onClick={() => handleEdit(x)}>Edit</button>
       <input type='text' onChange={handleEditInput} value={editInputValue} style={{width: '110px'}}></input>
       <button onClick={handleEditSubmit}>Submit Edit</button>
       <button onClick={handleDeleteBtn}>Delete</button>
+      <button onClick={handleStyleBtn}>Stylize</button>
       </div>
       })}
   </main>
